@@ -53,6 +53,23 @@ export default function LoginPage() {
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
 
+  // UseEffect para carregar o estado de login do localStorage ao iniciar
+  useEffect(() => {
+    if (typeof window !== 'undefined') { // Garante que o código só execute no navegador
+      const savedUser = localStorage.getItem("gincana_current_user")
+      if (savedUser) {
+        try {
+          const user = JSON.parse(savedUser)
+          setCurrentUser(user)
+          setIsLoggedIn(true)
+        } catch (e) {
+          console.error("Failed to parse user from localStorage", e)
+          localStorage.removeItem("gincana_current_user") // Limpa dados corrompidos
+        }
+      }
+    }
+  }, []) // O array vazio garante que este efeito rode apenas uma vez ao montar o componente
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setError("")
@@ -72,6 +89,10 @@ export default function LoginPage() {
       // Login bem-sucedido
       setCurrentUser(user)
       setIsLoggedIn(true)
+      // Salvar o usuário logado no localStorage
+      if (typeof window !== 'undefined') {
+        localStorage.setItem("gincana_current_user", JSON.stringify(user))
+      }
     } catch (error) {
       setError("Erro interno. Tente novamente.")
     }
@@ -79,8 +100,20 @@ export default function LoginPage() {
     setLoading(false)
   }
 
+  const handleLogout = () => {
+    setIsLoggedIn(false)
+    setCurrentUser(null)
+    // Remover o usuário do localStorage ao fazer logout
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem("gincana_current_user")
+    }
+    setUsername("")
+    setPassword("")
+    setError("")
+  }
+
   if (isLoggedIn && currentUser) {
-    return <Dashboard currentUser={currentUser} />
+    return <Dashboard currentUser={currentUser} handleLogout={handleLogout} />
   }
 
   return (
@@ -146,7 +179,7 @@ export default function LoginPage() {
   )
 }
 
-function Dashboard({ currentUser }: { currentUser: User }) {
+function Dashboard({ currentUser, handleLogout }: { currentUser: User, handleLogout: () => void }) {
   const [selectedGame, setSelectedGame] = useState<string | null>(null)
   const [teams, setTeams] = useState<Team[]>([])
   const [games, setGames] = useState<Game[]>([])
@@ -282,7 +315,7 @@ function Dashboard({ currentUser }: { currentUser: User }) {
                 <p className="text-sm text-gray-600">Bem-vindo, {currentUser.username}!</p>
               </div>
             </div>
-            <Button variant="outline" onClick={() => window.location.reload()}>
+            <Button variant="outline" onClick={handleLogout}>
               Sair
             </Button>
           </div>
@@ -302,9 +335,9 @@ function Dashboard({ currentUser }: { currentUser: User }) {
                 hover:shadow-blue-500/10
                 cursor-pointer
                 relative overflow-hidden
-                before:absolute before:inset-0 before:bg-gradient-to-br 
-                before:from-white/50 before:to-transparent 
-                before:translate-y-[100%] before:transition-transform 
+                before:absolute before:inset-0 before:bg-gradient-to-br
+                before:from-white/50 before:to-transparent
+                before:translate-y-[100%] before:transition-transform
                 before:duration-500 hover:before:translate-y-0
               "
             >
@@ -354,9 +387,9 @@ function Dashboard({ currentUser }: { currentUser: User }) {
     active:scale-95 active:shadow-sm
     hover:shadow-green-500/25
     relative overflow-hidden
-    before:absolute before:inset-0 before:bg-gradient-to-r 
-    before:from-green-400/20 before:to-emerald-400/20 
-    before:translate-x-[-100%] before:transition-transform 
+    before:absolute before:inset-0 before:bg-gradient-to-r
+    before:from-green-400/20 before:to-emerald-400/20
+    before:translate-x-[-100%] before:transition-transform
     before:duration-500 hover:before:translate-x-0
   "
                 size="sm"
@@ -386,9 +419,9 @@ function Dashboard({ currentUser }: { currentUser: User }) {
                 : "hover:bg-blue-50 hover:border-blue-300 hover:text-blue-700"
             }
             relative overflow-hidden
-            before:absolute before:inset-0 before:bg-gradient-to-r 
-            before:from-blue-400/20 before:to-purple-400/20 
-            before:translate-x-[-100%] before:transition-transform 
+            before:absolute before:inset-0 before:bg-gradient-to-r
+            before:from-blue-400/20 before:to-purple-400/20
+            before:translate-x-[-100%] before:transition-transform
             before:duration-500 hover:before:translate-x-0
           `}
                       onClick={() => setSelectedGame(selectedGame === game.name ? null : game.name)}
@@ -412,7 +445,7 @@ function Dashboard({ currentUser }: { currentUser: User }) {
                         size="sm"
                         onClick={() => deleteCustomGame(game.id)}
                         className="
-              absolute top-2 right-2 h-6 w-6 p-0 
+              absolute top-2 right-2 h-6 w-6 p-0
               bg-red-500 hover:bg-red-600 text-white border-red-500
               transition-all duration-200 ease-in-out
               transform hover:scale-110 active:scale-90
@@ -598,9 +631,9 @@ function GameManager({
     active:scale-95 active:shadow-sm
     hover:shadow-gray-800/25
     relative overflow-hidden
-    before:absolute before:inset-0 before:bg-gradient-to-r 
-    before:from-gray-600/20 before:to-gray-700/20 
-    before:translate-x-[-100%] before:transition-transform 
+    before:absolute before:inset-0 before:bg-gradient-to-r
+    before:from-gray-600/20 before:to-gray-700/20
+    before:translate-x-[-100%] before:transition-transform
     before:duration-500 hover:before:translate-x-0
   "
           disabled={loading || !newRound.teamId || !newRound.participants.trim()}
@@ -627,7 +660,7 @@ function GameManager({
                       size="sm"
                       onClick={() => deleteRound(round.id)}
                       className="
-    h-8 w-8 p-0 bg-black hover:bg-gray-800 text-white border-black 
+    h-8 w-8 p-0 bg-black hover:bg-gray-800 text-white border-black
     transition-all duration-200 ease-in-out
     transform hover:scale-110 active:scale-90
     hover:shadow-lg hover:shadow-gray-800/25
