@@ -250,7 +250,7 @@ function Dashboard({ currentUser }: { currentUser: User }) {
   }
 
   const calculateScore = (teamName: string) => {
-    return rounds.filter((round) => round.team_name === teamName).length
+    return rounds.filter((round) => round.team_name === teamName).length * 10
   }
 
   const getGameRounds = (gameName: string) => {

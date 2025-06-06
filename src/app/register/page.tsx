@@ -117,7 +117,7 @@ export default function RegisterPage() {
         <Card className="w-full max-w-md">
           <CardHeader className="text-center space-y-4">
             <div className="mx-auto w-24 h-24 rounded-full flex items-center justify-center shadow-lg border-4 border-white overflow-hidden">
-              <img src="/brasao-paroquia.png" alt="Brasão da Paróquia" className="w-full h-full object-cover" />
+              <img src="/brasao.jpeg" alt="Brasão da Paróquia" className="w-full h-full object-cover" />
             </div>
             <CardTitle className="text-2xl font-bold text-green-600">Usuário Criado!</CardTitle>
             <CardDescription>Sua conta foi criada com sucesso.</CardDescription>
@@ -137,7 +137,7 @@ export default function RegisterPage() {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center space-y-4">
           <div className="mx-auto w-24 h-24 rounded-full flex items-center justify-center shadow-lg border-4 border-white overflow-hidden">
-            <img src="/brasao-paroquia.png" alt="Brasão da Paróquia" className="w-full h-full object-cover" />
+            <img src="/brasao.jpeg" alt="Brasão da Paróquia" className="w-full h-full object-cover" />
           </div>
           <div>
             <CardTitle className="text-2xl font-bold">Criar Conta</CardTitle>
